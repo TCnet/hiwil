@@ -1,10 +1,10 @@
 # coding: utf-8
-set :application, 'zebra'
+set :application, 'hiwil'
 set :deploy_user, 'deploy'
 
 # setup repo details
 set :scm, :git
-set :repo_url, 'git@github.com:TCnet/zebra.git'
+set :repo_url, 'git@github.com:TCnet/hiwil.git'
 
 # setup rbenv.
 set :rbenv_type, :system
