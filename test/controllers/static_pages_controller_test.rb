@@ -3,7 +3,7 @@ require 'test_helper'
 class StaticPagesControllerTest < ActionDispatch::IntegrationTest
 
   def setup
-    @base_title = "BBS only for nbtcnet friends"
+    @base_title = "HIWIL ERP for Amazon"
   end
 
   test "should get root" do

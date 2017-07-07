@@ -10,6 +10,8 @@ class AlbumsControllerTest < ActionDispatch::IntegrationTest
     
   end
 
+  
+
   test "should redirect create when not logged in" do
     assert_no_difference 'Album.count' do
       post albums_path, params:{ album:{ name:"my album",summary: "mm"}}

@@ -2,7 +2,7 @@ require 'test_helper'
 
 class UsersControllerTest < ActionDispatch::IntegrationTest
   def setup
-    @base_title = "BBS only for nbtcnet friends"
+    @base_title = "HIWIL ERP for Amazon"
     @user = users(:michael)
     @other_user = users(:archer)
   end
