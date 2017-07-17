@@ -1,6 +1,6 @@
 class PhotosController < ApplicationController
   before_action :logged_in_user, only: [:create, :destroy]
-  before_action :correct_user, only: [:destroy]
+ # before_action :correct_user, only: [:destroy]
 
 
   
@@ -32,13 +32,13 @@ class PhotosController < ApplicationController
 
   
 
+  
+
   def destroy
-    album = Album.find(@photo.album_id)
-    if album.coverimg == @photo.picture.url(:normal)
-      album.coverimg = "nopic.jpg"
-      album.save
-    end
-    @photo.destroy
+    id = params[:id]
+    id = (params[:photo_ids] || []) if(id == "destroy_multiple")
+    #ids = params[:photo_ids] || params[:id]
+    Photo.destroy id if id
     flash[:success] = "Photo deleted"
     redirect_to request.referrer || albums_path
   end

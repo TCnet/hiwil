@@ -51,6 +51,11 @@ Rails.application.routes.draw do
     end
   end
   
+  resources :photos do
+    delete :destroy_multiple, action: :destroy, on: :collection
+  end
+  
+  
 
   
   
