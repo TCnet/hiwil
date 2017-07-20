@@ -340,7 +340,7 @@ class AlbumsController < ApplicationController
   end
 
   def show
-    
+    @category = category_for current_user.albums
     @album = Album.find(params[:id])
    # @user_brand = current_user.brand
    # @user_note = current_user.note
