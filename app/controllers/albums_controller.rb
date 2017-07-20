@@ -9,11 +9,14 @@ class AlbumsController < ApplicationController
  
  
   def index
-    @albums = current_user.albums.paginate(page: params[:page])
-    #@category = category_for current_user.albums
+   # @albums = current_user.albums.paginate(page: params[:page])
+   # @category = category_for current_user.albums
+    @category = category_for current_user.albums
     
+    sql = "name LIKE ?"
     #condition = params[:q].nil? "":"name like \%"+params[:q]+"\%"
-  #  @albums = current_user.albums.search(params[:q]).paginate(page: params[:page])
+    @albums = current_user.albums.where(sql,"%#{params[:q]}%").paginate(page: params[:page])
+    
   end
 
   def new
