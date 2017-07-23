@@ -9,6 +9,12 @@ module AlbumsHelper
     end
     result = result.uniq
   end
+
+  def keywords_for(num,keywords)
+    
+    s= keywords.in_groups(num, false) {|group| p group}
+    
+  end
   
   def code_for(photos,stylecode)
     code=[]
@@ -165,7 +171,11 @@ module AlbumsHelper
   def size_for(size,n,separate, usszie)
     ob = usszie.split(' ')
     if !usszie.empty? && ob.length > n     
-      return "US"+separate+ob[n]     
+      if ob[n].match /^[A-Za-z]*/
+        return ob[n].upcase
+      else
+        return "US"+separate+ob[n]
+      end  
     else
       return size.upcase
     end
