@@ -86,6 +86,8 @@ module AlbumsHelper
 
   def size_map_for (size)
     case size.downcase
+    when "xs","26"
+      "X-Small"
     when "s","28"
       "Small"
     when "m", "29"
@@ -102,6 +104,8 @@ module AlbumsHelper
       "XXXX-Large"
     when "5xl","xxxxxl","38"
       "XXXXX-Large"
+    when "f"
+      "X-Large"
     else
       "Unknown"
     end 
