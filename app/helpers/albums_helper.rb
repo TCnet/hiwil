@@ -10,12 +10,25 @@ module AlbumsHelper
     result = result.uniq
   end
 
+ 
+
+
   def keywords_for(num,keywords)
     
     s= keywords.in_groups(num, false) {|group| p group}
     
   end
-  
+
+  def keywords_for3(num=250,keywords)
+    key_length = keywords.tr(" ","").length
+    m = key_length / num
+    n =  key_length % num
+    key_array =  keywords.split(' ')
+    s= key_array.in_groups(m+1, false) {|group| p group}
+    
+    
+  end
+
   def code_for(photos,stylecode)
     code=[]
     strcode = ''
@@ -26,15 +39,15 @@ module AlbumsHelper
     n  = stylecode.index("$")
     m = stylecode.scan(/[$]/).length
     #获取颜色分组
-
     
     photos.each do |f|
-      if f.name.length < stylecode.length
+
+      if f.name.length < stylecode.length  
         name = f.name[0,2].downcase
       else
         name = f.name[n,m].downcase
       end
-  
+      
       if !strcode.include? name
         strcode += name
         strcode +=" "
@@ -50,6 +63,7 @@ module AlbumsHelper
     
   end
 
+  
 
   def color_map_for(name)
     downname = name.downcase
@@ -174,12 +188,13 @@ module AlbumsHelper
   #size for the us
   def size_for(size,n,separate, usszie)
     ob = usszie.split(' ')
-    if !usszie.empty? && ob.length > n     
-      if ob[n].match /^[A-Za-z]*/
+    if !usszie.empty? 
+      if( ob[n].upcase =~ /[A-Z]$/ )
         return ob[n].upcase
+       
       else
         return "US"+separate+ob[n]
-      end  
+      end
     else
       return size.upcase
     end
@@ -199,8 +214,6 @@ module AlbumsHelper
 
   
 
- 
-
   def to_in(cm,is_in)
     result = ''
     str = cm.to_s.split('-')
@@ -214,14 +227,12 @@ module AlbumsHelper
         result +=strcm+"\""
       end
       if e<str.length-1
-        result += "-"
+       result += "-"
       end
       
     end
     return result
   end
-
-
 
   def to_us_size_for(ussize,csize,str)
     ob=ussize 
@@ -248,8 +259,48 @@ module AlbumsHelper
     
   end
 
-
+  def stock_two_arry(codelength,csizelength,stock)
+    
+    ob = stock.tr("\n","|").split('|')
+    if(ob.length>1)
+      
+    
+      result = Array.new
+      ob.each_with_index do |f,n|
   
+        mob= f.split(' ')
+        if(mob.length>1)        
+          result[n]= f.split(' ').map{|item| item.to_i}
+         
+        else
+          result[n]=Array.new(csizelength,f.to_in)
+        end
+      
+      end
+      return result
+      
+    elsif(stock.empty?)
+      return Array.new(codelength, Array.new(csizelength, 0))
+    elsif(stock.split(' ').length>1)
+      s= stock.split(' ')
+      if(s.length<csizelength)
+        csizelength-s.length.times do |f|
+         s << 0
+        end
+      end
+      s= s.map{|item| item.to_i}
+      return Array.new(codelength,s)
+    else
+      
+      return Array.new(codelength, Array.new(csizelength, stock.to_i))
+    end
+    
+      
+    
+    
+  end
+
+ 
 
 
   def description_size_for(desize,csize,is_in=false)
@@ -271,6 +322,7 @@ module AlbumsHelper
           destr +=" "
           dearray.length.times do |c|
             if c > 0&& c-1==e
+              
               destr += to_in(dearray[c][num],is_in)
               
             end
