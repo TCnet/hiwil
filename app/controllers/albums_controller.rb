@@ -9,15 +9,16 @@ class AlbumsController < ApplicationController
  
  
   def index
-   # @albums = current_user.albums.paginate(page: params[:page])
-   # @category = category_for current_user.albums
+   # @allalbums = current_user.albums
     @category = category_for current_user.albums
     
     sql = "name LIKE ?"
     #condition = params[:q].nil? "":"name like \%"+params[:q]+"\%"
-    @albums = current_user.albums.where(sql,"%#{params[:q]}%").paginate(page: params[:page])
-    
+   @albums = current_user.albums.where(sql,"%#{params[:q]}%").paginate(page: params[:page])
+   # @albums = current_user.albums.search(params[:q]).paginate(page: params[:page])
   end
+
+  
 
   def new
     @album = Album.new
@@ -31,8 +32,10 @@ class AlbumsController < ApplicationController
 
   def exportexcel
     @album = Album.find(params[:id])
+
     is_in = params[:album][:is_in].downcase=="in"?true:false
     
+    keywords_type = 1
     book = Spreadsheet::Workbook.new
     sheet1 = book.create_worksheet
     sheet1.name = 'Template'
@@ -48,27 +51,31 @@ class AlbumsController < ApplicationController
     cloum_item_name=4+cloumbegin
     
     cloum_color= 5+cloumbegin
-    cloum_department =6+cloumbegin
+    colormapcloum = 6+cloumbegin
+    cloum_department =9+cloumbegin
     cloum_size = 7+cloumbegin
-    cloum_s_price =8+cloumbegin
-    cloum_quantity = 9+cloumbegin
-    imgcloum= 10+cloumbegin
-
-    
+    sizemapcloum = 8+cloumbegin
+    cloum_s_price =8+2+cloumbegin
+    cloum_quantity = 9+2+cloumbegin
+    imgcloum= 10+2+cloumbegin
+        
     rowheight = 18
     columnwidth = 12
     
 
-    cloum_parent_child = 19+cloumbegin
-    cloum_parent_sku = 20+cloumbegin
-    cloum_relationship_type=21+cloumbegin
-    cloum_theme =22+cloumbegin
-    decriptioncloum = 23+cloumbegin
+    cloum_parent_child = 19+2+cloumbegin
+    cloum_parent_sku = 20+2+cloumbegin
+    cloum_relationship_type=21+2+cloumbegin
+    cloum_theme =22+2+cloumbegin
+    decriptioncloum = 23+2+cloumbegin
 
-    colormapcloum = 36+cloumbegin
-    cloum_keywords = 31 +cloumbegin
-    cloum_points = 30 + cloumbegin
-    sizemapcloum = 37+cloumbegin
+   
+    cloum_keywords = 31+2 +cloumbegin
+    cloum_points = 30+2 + cloumbegin
+
+    cloum_list_price = 38 + cloumbegin
+    cloum_sale_price = 39 + cloumbegin
+  
     parentsku = @album.name.upcase
     brand = album_params[:brand]
     dnote = album_params[:dnote]
@@ -122,7 +129,9 @@ class AlbumsController < ApplicationController
     
     
        
-    code = code_for photos,current_user.imgrule
+    
+    
+    code = code_for photos, current_user.imgrule
     
     ussize = to_us_size_for album_params[:ussize],csize,"Tag Size "
     
@@ -135,10 +144,11 @@ class AlbumsController < ApplicationController
     if !brand.empty?
       dest +="Brand: <strong>"+brand+"</strong><br><br>\n"
     end
-    
     if !dname.empty?
-      dest +=dname.gsub("\n","<br>")+"<br>\n"
+      dest += dname.gsub("\n","<br>") +"<br>\n"
     end
+    
+  
     
     dest += description_size_for album_params[:description],ussize,is_in
     if !dnote.empty?
@@ -186,10 +196,7 @@ class AlbumsController < ApplicationController
     skunum= csize.length
     sheet1.row(1).height = rowheight
     sheet1[1,skucloum] = parentsku
-    
     code.each_with_index do |n,index|
-     
-     
       csize.each_with_index do |m,j|
         rownum = index*skunum+j+2
         sheet1.row(rownum).height = rowheight
@@ -261,11 +268,12 @@ class AlbumsController < ApplicationController
     sheet1[0,cloum_theme] = "variation_theme"
     sheet1[0,cloum_quantity]= "quantity"
     sheet1[0,cloum_s_price] = "standard_price"
+    sheet1[0,cloum_list_price]="list_price"
+    sheet1[0,cloum_sale_price]="sale_price"
     sheet1[0,cloum_item_name]="item_name"
     sheet1[0,cloum_color] = "color_name"
     sheet1[0,cloum_size] = "size_name"
     sheet1[0,cloum_item_type] = "item_type"
-    #sheet1[0,cloum_keywords] = "generic_keywords"
     sheet1[0,cloum_keywords] = "generic_keywords1"
     sheet1[0,cloum_keywords+1] = "generic_keywords2"
     sheet1[0,cloum_keywords+2] = "generic_keywords3"
@@ -279,6 +287,9 @@ class AlbumsController < ApplicationController
     points.each_with_index do |f,n|
       sheet1[titlecloum,cloum_points-4+n] = f 
     end
+
+
+    
     
 
     sheet1[titlecloum,cloum_parent_child] = "Parent"
@@ -288,16 +299,34 @@ class AlbumsController < ApplicationController
     sheet1[titlecloum,cloum_brand] = brand
     sheet1[titlecloum,cloum_department] = "womens"
     sheet1[titlecloum,cloum_item_name] = fullname_for(brandname,fullname,"","")
+
+    
+
     #sheet1[titlecloum,cloum_keywords] = album_params[:keywords].tr("\n",",")
 
-    keywords_arry = album_params[:keywords].tr("\n",",").split(',').uniq
+    keywords_arry = album_params[:keywords].tr("\n\r",",").split(',').map{|x| x.strip }.uniq.delete_if{|x| !x.to_s.present?}
+    
+    #price set
+    price_arry = album_params[:price].tr(" ",",").tr("|",",").split(',')
+
+    stock_arry = stock_two_arry(code.length,csize.length,album_params[:stock])
+    
+
+    keywords_uniq = album_params[:keywords].tr("\n\r"," ").split(' ').uniq.join(' ')[0,1000]
     #album_params[:keywords] = 
     keywords_total = code.length * csize.length * 5+5
 
-    if(keywords_arry.length<keywords_total)
-      sheet1[titlecloum,cloum_keywords] =  keywords_arry.join(',')
-      
+    if keywords_type == 1
+      if(keywords_arry.length<keywords_total)
+        sheet1[titlecloum,cloum_keywords] =  keywords_arry.join(',')
+        
+      end
+    else
+      #for keywords 2
+      sheet1[titlecloum,cloum_keywords] = keywords_uniq
     end
+
+    
     
     code.each_with_index do |f,n|
       csize.each_with_index do |e,m|
@@ -315,47 +344,106 @@ class AlbumsController < ApplicationController
         sheet1[num,cloum_parent_child]="Child"
         sheet1[num,cloum_relationship_type]="Variation"
         sheet1[num,cloum_theme]="sizecolor"
-        sheet1[num,cloum_quantity]= 50
+        sheet1[num,cloum_quantity]= stock_arry[n][m]
         sheet1[num,cloum_color]=colorname
         sheet1[num,cloum_size] = sizename
         sheet1[num,cloum_item_name] = fullname_for(brandname,fullname,colorname,sizename.tr("-"," ").tr("/","-"))
-        #sheet1[num,cloum_keywords] = album_params[:keywords].tr("\n",",")
-        if(keywords_arry.length<keywords_total)
-          sheet1[num,cloum_keywords] =  keywords_arry.join(',')
-          
+
+        if keywords_type == 1
+          if(keywords_arry.length<keywords_total)
+            sheet1[num,cloum_keywords] =  keywords_arry.join(',')
+            
+          end
+        else
+          #for keywords 2
+          sheet1[num,cloum_keywords] =  keywords_uniq
         end
+
+
+        
+        #set price
+        if(price_arry.length>0)
+          sheet1[num,cloum_s_price] = price_arry[0].to_f.round(2)
+          
+          if(price_arry.length==1)
+            sheet1[num,cloum_list_price] = price_arry[0].to_f.round(2)
+            sheet1[num,cloum_sale_price] = price_arry[0].to_f.round(2)
+          elsif(price_arry.length==2)          
+            sheet1[num,cloum_list_price] = price_arry[1].to_f.round(2)
+          elsif(price_arry.length>2)         
+            sheet1[num,cloum_list_price] = price_arry[1].to_f.round(2)
+            sheet1[num,cloum_sale_price] = price_arry[2].to_f.round(2)
+          end
+               
+        end
+        
+        
+    
+        
+        
         
         
         
       end
     end
+
 
     #设置keywors
 
-    
-    if(keywords_arry.length > keywords_total)
-      key_array= keywords_for keywords_total,keywords_arry
+    if keywords_type==1
       
-      sheet1[titlecloum,cloum_keywords] = key_array[0].join(',')
-      sheet1[titlecloum,cloum_keywords+1] = key_array[1].join(',')
-      sheet1[titlecloum,cloum_keywords+2] = key_array[2].join(',')
-      sheet1[titlecloum,cloum_keywords+3] = key_array[3].join(',')
-      sheet1[titlecloum,cloum_keywords+4] = key_array[4].join(',')
+      if(keywords_arry.length > keywords_total)
+        key_array= keywords_for keywords_total,keywords_arry
+        
+        sheet1[titlecloum,cloum_keywords] = key_array[0].join(',')
+        sheet1[titlecloum,cloum_keywords+1] = key_array[1].join(',')
+        sheet1[titlecloum,cloum_keywords+2] = key_array[2].join(',')
+        sheet1[titlecloum,cloum_keywords+3] = key_array[3].join(',')
+        sheet1[titlecloum,cloum_keywords+4] = key_array[4].join(',')
+        
+        code.each_with_index do |f,n|
+          csize.each_with_index do |e,m|
+            num = n*csize.length+m+titlecloum
+            sn = (num-1)*5+5
+
+            sheet1[num+1,cloum_keywords] = key_array[sn].join(',')
+            sheet1[num+1,cloum_keywords+1] = key_array[sn+1].join(',')
+            sheet1[num+1,cloum_keywords+2] = key_array[sn+2].join(',')
+            sheet1[num+1,cloum_keywords+3] = key_array[sn+3].join(',')
+            sheet1[num+1,cloum_keywords+4] = key_array[sn+4].join(',')
+            
+          end
+        end
+      end
       
+    else
+      #keywords 2
+      key_array = keywords_for 4,keywords_arry
+
+      sheet1[titlecloum,cloum_keywords+1] = key_array[0].join(',')[0,1000]
+      sheet1[titlecloum,cloum_keywords+2] = key_array[1].join(',')[0,1000]
+      sheet1[titlecloum,cloum_keywords+3] = key_array[2].join(',')[0,1000]
+      sheet1[titlecloum,cloum_keywords+4] = key_array[3].join(',')[0,1000]
+
       code.each_with_index do |f,n|
         csize.each_with_index do |e,m|
           num = n*csize.length+m+titlecloum
-          sn = (num-1)*5+5
-
-          sheet1[num+1,cloum_keywords] = key_array[sn].join(',')
-          sheet1[num+1,cloum_keywords+1] = key_array[sn+1].join(',')
-          sheet1[num+1,cloum_keywords+2] = key_array[sn+2].join(',')
-          sheet1[num+1,cloum_keywords+3] = key_array[sn+3].join(',')
-          sheet1[num+1,cloum_keywords+4] = key_array[sn+4].join(',')
+          
+          #sheet1[num+1,cloum_keywords] = key_array[0].join(',')[0,1000]
+          sheet1[num+1,cloum_keywords+1] = key_array[0].join(',')[0,1000]
+          sheet1[num+1,cloum_keywords+2] = key_array[1].join(',')[0,1000]
+          sheet1[num+1,cloum_keywords+3] = key_array[2].join(',')[0,1000]
+          sheet1[num+1,cloum_keywords+4] = key_array[3].join(',')[0,1000]
           
         end
       end
+      
     end
+    
+
+   
+
+    
     
     
 
@@ -378,11 +466,19 @@ class AlbumsController < ApplicationController
     end
     #render :action=> "show"
     #redirect_to "show"
+
+    #flash[:success] = "Export excel sucessful!"
+    #redirect_to @album and return
+    #redirect_to(:action => "show") and return
+    #redirect_to (:back), :notice => "problem with the start_date and end_date" and return
     
+    #redirect_to root_url
   end
 
   def show
     @category = category_for current_user.albums
+    
+   # @in_select={"Yes"=>true,"No"=>false}
     @album = Album.find(params[:id])
    # @user_brand = current_user.brand
    # @user_note = current_user.note
@@ -447,9 +543,9 @@ class AlbumsController < ApplicationController
   end
   
   private
+    
     def album_params
-     # params.require(:album).permit(:name, :summary,:csize,:ussize,:brand,:fullname,:dname,:description,:dnote,:keywords,:points)
-      params.require(:album).permit(:name, :summary,:csize,:ussize,:brand,:fullname,:dname,:description,:dnote,:points,:keywords)
+      params.require(:album).permit(:name, :summary,:csize,:ussize,:brand,:fullname,:dname,:description,:dnote,:keywords,:points,:price,:stock)
     end
 
     def correct_album
