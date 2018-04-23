@@ -251,6 +251,8 @@ module AlbumsHelper
       "Dark Yellow"
     when "gm","nm","km","ym","bm","lm","dm","km"
       "Camoflag"
+    when "iv"
+      "Ivory"
       
           
       
