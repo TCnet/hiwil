@@ -3,6 +3,14 @@ class ClearsController < ApplicationController
   end
 
   def create
+    #
+    title= params[:clear][:title].split(' ')
+    outt=title.join("\n")
+    
+    
+    
+    
+    #keywords
     word=params[:clear][:keywords].downcase
     str=word.split(' ')
     a=[]
@@ -25,6 +33,7 @@ class ClearsController < ApplicationController
     flash.now[:success]=str.length.to_s+"|"+a.length.to_s+"|"+a.join(' ')
     flash.now[:danger]=num
     flash.now[:info]=acm.join(' ')
+    flash.now[:warning]=outt
     render 'new'
   end
 end

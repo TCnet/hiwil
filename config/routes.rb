@@ -44,6 +44,7 @@ Rails.application.routes.draw do
 
   resources :upcs
   resources :kwords
+  resources :etemplates
   
   resources :albums do
     member do

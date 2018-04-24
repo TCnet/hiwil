@@ -6,7 +6,9 @@
   <%= f.label :keywords %>
   <%= f.text_field :keywords, class: 'form-control' %>
   <%= f.label :numcm %>
-   <%= f.text_field :numcm, class: 'form-control' %>
+  <%= f.text_field :numcm, class: 'form-control' %>
+   <%= f.label :title %>
+   <%= f.text_area :title,rows: 10, class: 'form-control' %>
 
   <%= f.submit "Sub", class: "btn btn-primary" %>
 <% end %>
