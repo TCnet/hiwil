@@ -8,6 +8,17 @@
 
     <div class="row templates">
       <table class="table">
+        <tr>
+          <td>
+            Name
+          </td>
+          <td>IsUsed
+          </td>
+           <td>Options
+            </td>
+
+
+        </tr>
 
 
       <% @etemplates.each do |ob| %>
@@ -17,7 +28,8 @@
 
         </td>
         <td>
-          <%= ob.isused==1?"使用中":"未使用" %>
+
+          <%= ob.isused %>
 
         </td>
         <td><p>
