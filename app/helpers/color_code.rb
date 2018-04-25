@@ -22,7 +22,7 @@ module ColorCode
     when "gr","ag","ln","dn"
       "Green"
     when "gy","lg","dg"
-      "Green"
+      "Grey"
     when "mt"
       "Metallic"
     when "mc"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180424151310) do
+ActiveRecord::Schema.define(version: 20180425005844) do
 
   create_table "albums", force: :cascade do |t|
     t.string   "name"
@@ -40,7 +40,7 @@ ActiveRecord::Schema.define(version: 20180424151310) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer  "user_id"
-    t.         "isused"
+    t.boolean  "isused"
     t.index ["user_id"], name: "index_etemplates_on_user_id"
   end
 

@@ -41,7 +41,7 @@ class AlbumsController < ApplicationController
       @etemplate = current_user.etemplates.build()
       @etemplate.name="Default_template_2015"
       @etemplate.title=DEFAULT_E
-      @etemplate.isused= 1
+      @etemplate.isused= true
       @etemplate.save
 
     end
