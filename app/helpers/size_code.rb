@@ -55,7 +55,7 @@ module SizeCode
     elsif(size.downcase=="tm")
       return "One Size"
     else
-      return size.upcase
+      return  !asize_arry[n].nil?? size.upcase+" / "+asize_arry[n] : size.upcase
     end
   end
   #end size_for
