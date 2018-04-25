@@ -38,14 +38,19 @@ module SizeCode
   #end size map
 
   #size for the us
-  def size_for(size,n,separate, usszie)
+  def size_for(size,n,separate, usszie,asize)
+    result=size
     ob = usszie.split(' ')
+    asize_arry = asize.tr("\n\r","|").split('|')
     if !usszie.empty? 
       if( ob[n].upcase =~ /[A-Z]$/ )
-        return ob[n].upcase
+       
+        result = !asize_arry[n].nil?? ob[n].upcase+" / "+asize_arry[n] : ob[n].upcase
+        return result
         
       else
-        return "US"+separate+ob[n]
+        result = !asize_arry[n].nil?? "US"+separate+ob[n]+" / "+asize_arry[n] : "US"+separate+ob[n]
+        return result
       end
     elsif(size.downcase=="tm")
       return "One Size"
