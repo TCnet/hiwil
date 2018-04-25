@@ -331,7 +331,7 @@ class AlbumsController < ApplicationController
         end
         if(t_ob=="item_name")
           sheet1[titlecloum,t_num] = fullname_for(brandname,fullname,"","")
-          sheet1[num,t_num]=  fullname_for(brandname,fullname,colorname,sizename.tr("-"," ").tr("/","-"))
+          sheet1[num,t_num]=  fullname_for(brandname,fullname,colorname,sizename.tr("-","").tr("/","").split(' ').join(' '))
         end
         
         
