@@ -270,7 +270,7 @@ class AlbumsController < ApplicationController
       csize.each_with_index do |e,m|
         num = n*csize.length+m+titlecloum+1
         colorname = color_for(f)
-        sizename = size_for(e,m,"-", album_params[:ussize],album_params[:asize])
+        sizename = size_for(e,m," ", album_params[:ussize],album_params[:asize])
 
         #set points
         if(t_ob=="bullet_point1")
