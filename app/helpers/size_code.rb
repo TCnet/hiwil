@@ -3,9 +3,13 @@ module SizeCode
   #size_map
   def size_map_for (size)
     case size.downcase
-    when "xxs","26"
+    when "xxxxs","24"
+      "XXXX-Small"
+    when "xxxs","26"
+      "XXX-Small"
+    when "xxs","28"
       "XX-Small"
-    when "xs","28"
+    when "xs","29"
       "X-Small"
     when "s","30"
       "Small"
