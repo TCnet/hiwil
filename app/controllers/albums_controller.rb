@@ -35,7 +35,7 @@ class AlbumsController < ApplicationController
     @album = Album.find(params[:id])
     @etemplate =  current_user.etemplates.first
     if(current_user.etemplates.count>0)
-      @etemplate =  current_user.etemplates.order(isused: :desc).first
+      @etemplate =  current_user.etemplates.order(isused: :desc).order(created_at: :desc).first
       
     else
       @etemplate = current_user.etemplates.build()
