@@ -4,6 +4,7 @@ class AlbumsController < ApplicationController
  before_action :correct_album, only: [:show,:edit, :update, :destroy]
  include PhotosHelper
  include AlbumsHelper
+ include ExportExcel
  require "spreadsheet"
 
  Spreadsheet.client_encoding = "UTF-8"  
@@ -31,21 +32,12 @@ class AlbumsController < ApplicationController
     end
   end
 
+ 
+
   def exportexcel
     @album = Album.find(params[:id])
-    @etemplate =  current_user.etemplates.first
-    if(current_user.etemplates.count>0)
-      @etemplate =  current_user.etemplates.order(isused: :desc).order(created_at: :desc).first
-      
-    else
-      @etemplate = current_user.etemplates.build()
-      @etemplate.name="Default_template_2015"
-      @etemplate.title=DEFAULT_E
-      @etemplate.isused= true
-      @etemplate.save
-
-    end
-    
+   
+    @etemplate = get_template current_user
     title_arry = @etemplate.title.split(' ')
 
     
@@ -614,6 +606,24 @@ class AlbumsController < ApplicationController
     
     
    
+  end
+
+  def outexcel
+    id = params[:id]
+    id = (params[:album_ids] || []) if(id == "out_multiple")
+    id = params[:album_ids]
+    path= File.join Rails.root, 'public/'
+    etemplate= get_template current_user
+   
+    #flash[:sucess] = obs.first.name
+    if(id.nil?)
+      flash[:danger] = "Please select album first!"
+      redirect_to albums_path
+    else
+      obs= Album.find id
+      outamazon obs,etemplate,path,current_user
+    end
+    
   end
 
   
