@@ -7,6 +7,7 @@ module KwordsHelper
     s = keywords_arry
    
     lef_arry.each do |n|
+      
       s= s.delete_if{|x| x.to_s.include?(n.to_s.chomp)}
     end
    

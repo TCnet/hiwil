@@ -49,6 +49,7 @@ module ExportExcel
       
       
       keywords_type=3
+      
       is_in=false
       otherimg_num = get_titlenumber title_arry,"other_image"
       parentsku = album.name.upcase
