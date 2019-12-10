@@ -17,7 +17,7 @@ gem 'coffee-rails', '4.2.1'
 gem 'jquery-rails', '4.1.1'
 gem 'turbolinks', '5.0.0'
 gem 'jbuilder',  '2.4.1'
-gem 'unicorn', '~> 4.8.3'
+gem 'unicorn', '~> 5.5.1'
 
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
